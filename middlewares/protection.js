@@ -10,8 +10,6 @@ const loggedIn = (req, res, next) => {
 const protected = (req, res, next) => {
     // check if user id exists in session
 
-    console.log(req.session)
-
     if(req.session.userId){
         next(); // call next function to handle request
     }else{

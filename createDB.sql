@@ -15,7 +15,7 @@ CREATE TABLE "Users" (
     "Email" varchar(255)   NOT NULL,
     "UserName" varchar(255)   NOT NULL,
     "Contact" varchar(20),
-    "Password" varchar(128)   NOT NULL,
+    "Password" varchar(255)   NOT NULL,
     "Blocked" boolean,
     "LastActive" timestamp,
     "CreatedAt" timestamp NOT NULL DEFAULT NOW(),

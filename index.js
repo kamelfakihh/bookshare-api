@@ -12,8 +12,8 @@ const {
     DB_PORT,
     SESSION_NAME,
     SESSION_SECRET,
-    SESSION_AGE,
-    SESSION_SECURE,
+    SESSION_AGE = 1000*60*60*2,
+    SESSION_SECURE = process.env === "production",
     DB_USER,
     DB_HOST,
     DB,
@@ -29,7 +29,7 @@ const pgPool = new Pool({
     host: DB_HOST,
     database: DB,
     password: DB_PASSWORD,
-    port: DB_PORT,
+    port: Number(DB_PORT),
 });
 
 // create connect-pg-simple session object

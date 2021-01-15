@@ -51,8 +51,6 @@ router.post('/login', loggedIn, async (req, res) => {
                 // add user to session after authorization
                 req.session.userId =  user.ID;    
 
-                console.log(req.session.userId)
-
                 return res.status(200).json({
                     FirstName : user.FirstName, 
                     LastName : user.LastName, 

@@ -23,10 +23,10 @@ POST  http://localhost:5000/users/register HTTP/1.1
 content-type: application/json
 
 {
-    "FirstName" : "Nourhan",
+    "FirstName" : "Kamel",
     "LastName" : "Fakih",
-    "UserName" : "Nana11",
-    "Email" : "nourhan11@gmail.com",
+    "UserName" : "KamelFakih1",
+    "Email" : "kamel1@gmail.com",
     "Password" : "Password123"   
 }
 
