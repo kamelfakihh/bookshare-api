@@ -1,0 +1,30 @@
+CREATE ROLE kamel WITH LOGIN PASSWORD '181201';
+
+ALTER ROLE kamel CREATEDB;
+
+\du
+
+\q
+
+psql -d postgres -U me
+
+CREATE DATABASE sessionauth;
+
+\list
+
+\c sessionauth
+
+CREATE TABLE "session" (
+  "sid" varchar NOT NULL COLLATE "default",
+	"sess" json NOT NULL,
+	"expire" timestamp(6) NOT NULL
+)
+WITH (OIDS=FALSE);
+
+ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+
+CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+
+create extension "uuid-ossp";
+
+CREATE TABLE "users" ( id UUID NOT NULL DEFAULT uuid_generate_v4(),email VARCHAR(255) UNIQUE NOT NULL, name VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL,  CONSTRAINT "pk_users" PRIMARY KEY (id) );
