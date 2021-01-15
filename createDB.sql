@@ -58,7 +58,7 @@ CREATE TABLE "Notification" (
     "AddedAt" timestamp   NOT NULL DEFAULT NOW(),
     "ViewedAt" timestamp,
     CONSTRAINT "pk_Notification" PRIMARY KEY (
-        "id"
+        "ID"
      )
 );
 
