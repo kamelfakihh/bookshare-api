@@ -32,7 +32,7 @@ const router = new Router();
 router.post('/login', loggedIn, async (req, res) => {
 
     try{
-        
+
         const {Email, Password} = req.body;
 
         // validate email and password
@@ -63,7 +63,7 @@ router.post('/login', loggedIn, async (req, res) => {
             }
 
         }else {
-            res.json({message : 'please provide valid parameters'})
+            res.status(403).json({message : 'please provide valid parameters'})
         }
 
     }catch(error){
@@ -108,7 +108,7 @@ router.post('/register', loggedIn, async (req, res) => {
             res.status(200).json({FirstName, LastName, UserName});
 
         }else {
-            res.json({message : 'please provide valid parameters'})
+            res.status(403).json({message : 'please provide valid parameters'})
         }
 
     }catch(error){
@@ -121,11 +121,11 @@ router.post('/register', loggedIn, async (req, res) => {
 router.post('/logout', protected,  (req, res) => {
     req.session.destroy( error => {
         if(error){
-            res.json({message : 'failed to logout'});
+            res.status(403).json({message : 'failed to logout'});
         }
 
         res.clearCookie(SESSION_NAME);
-        res.json({message : 'logged out'});
+        res.status(400).json({message : 'logged out'});
     })
 });
 

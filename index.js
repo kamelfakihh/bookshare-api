@@ -5,6 +5,7 @@ const pgSession = require('connect-pg-simple')(session);
 const {protected} = require('./middlewares/protection')
 const dotenv = require('dotenv');
 
+
 dotenv.config();
 
 const {
@@ -49,13 +50,23 @@ app.use(session({
         path : '/',
         domain : null,
         httpOnly : true,
-        maxAge : SESSION_AGE,
         sameSite : true,
         secure : SESSION_SECURE
     }
 }));
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+    res.header('Access-control-Allow-Origin', 'http://localhost:3000');
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    res.header('Access-Control-Allow-Credentials', true);
+
+    next();
+})
 
 // gets executed before all middlewares and adds user details to request locals object 
 // that is shared accross all middlewares
