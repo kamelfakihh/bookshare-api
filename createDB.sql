@@ -36,7 +36,8 @@ CREATE TABLE "Books" (
     "Author" varchar(255),
     "PublishDate" date,
     "Description" varchar(1000),
-    "Category" int  NOT NULL,
+    "Image_url" : varchar(2083),
+    "Genre" int  NOT NULL,
     "Level" int   NOT NULL,
     "ISBN" varchar(14),
     "Available" boolean DEFAULT TRUE,
@@ -62,11 +63,11 @@ CREATE TABLE "Notification" (
      )
 );
 
-CREATE TABLE "Categories" (
+CREATE TABLE "Genres" (
     "ID" serial   NOT NULL,
     "Name" varchar(255)   NOT NULL,
     "Description" varchar(1000),
-    CONSTRAINT "pk_Categories" PRIMARY KEY (
+    CONSTRAINT "pk_Genres" PRIMARY KEY (
         "ID"
      )
 );
@@ -91,11 +92,12 @@ CREATE TABLE "Favourites" (
 );
 
 CREATE TABLE "Viewed" (
+    "ID" serial NOT NULL,
     "UserId" uuid   NOT NULL,
     "BookId" int   NOT NULL,
-    "ViewedAt" timestamp   NOT NULL,
+    "ViewedAt" timestamp   NOT NULL DEFAULT NOW(),
     CONSTRAINT "pk_Viewed" PRIMARY KEY (
-        "UserId","BookId"
+        "ID"
      )
 );
 
@@ -146,8 +148,8 @@ CREATE INDEX "IDX_session_expire" ON "session" ("expire");
 ALTER TABLE "Books" ADD CONSTRAINT "fk_Books_UserId" FOREIGN KEY("UserId")
 REFERENCES "Users" ("ID");
 
-ALTER TABLE "Books" ADD CONSTRAINT "fk_Books_Category" FOREIGN KEY("Category")
-REFERENCES "Categories" ("ID");
+ALTER TABLE "Books" ADD CONSTRAINT "fk_Books_Genre" FOREIGN KEY("Genre")
+REFERENCES "Genres" ("ID");
 
 ALTER TABLE "Books" ADD CONSTRAINT "fk_Books_Level" FOREIGN KEY("Level")
 REFERENCES "Levels" ("ID");

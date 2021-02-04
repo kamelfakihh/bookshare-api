@@ -3,7 +3,7 @@ const express = require('express');
 const {Router} = require('express');
 const {isEmail, isPassword} = require('../helper/validation');
 const {hashPassword, verifyPassword} = require('../helper/password');
-const {protected, loggedIn} = require('../middlewares/protection')
+const {protected, loggedIn} = require('../middlewares/protection');
 
 const dotenv = require('dotenv');
 
@@ -29,6 +29,9 @@ const pool = new Pool({
 
 const router = new Router();
 
+// @route       GET api/users/login
+// @desc        login a user
+// @access      Public - not logged in 
 router.post('/login', loggedIn, async (req, res) => {
 
     try{
@@ -73,6 +76,9 @@ router.post('/login', loggedIn, async (req, res) => {
 
 });
 
+// @route       GET api/users/register
+// @desc        register a user
+// @access      Public - not logged in
 router.post('/register', loggedIn, async (req, res) => {
 
     try{
@@ -118,6 +124,9 @@ router.post('/register', loggedIn, async (req, res) => {
 
 });
 
+// @route       GET api/users/logout
+// @desc        logut a user
+// @access      Protected
 router.post('/logout', protected,  (req, res) => {
     req.session.destroy( error => {
         if(error){
@@ -125,7 +134,7 @@ router.post('/logout', protected,  (req, res) => {
         }
 
         res.clearCookie(SESSION_NAME);
-        res.status(400).json({message : 'logged out'});
+        res.status(200).json({message : 'logged out'});
     })
 });
 

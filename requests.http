@@ -1,36 +1,54 @@
+###
 
-GET  http://localhost:5000/home HTTP/1.1
-content-type: application/json
+GET http://localhost:5000/api/books/?offset=0&limit=6
 
 ###
 
-GET  http://localhost:5000/dashboard HTTP/1.1
-content-type: application/json
+GET http://localhost:5000/api/books/16
 
 ###
 
-POST  http://localhost:5000/users/login HTTP/1.1
+DELETE  http://localhost:5000/api/books/5
+
+###
+
+POST http://localhost:5000/api/books/post
 content-type: application/json
 
 {
-    "Email" : "kamel@gmail.com",
-    "Password" : "Password123"    
+    "Title" : "No Place Like Here", 
+    "Author" : "Christina June", 
+    "PublishDate" : "2007-05-22", 
+    "Genre" : 1, 
+    "Level" : 1,
+    "ISBN" : "0-5562-0702-5", 
+    "Location" : "Lebanon", 
+    "image_url" : "https://i.pinimg.com/236x/0c/ee/7e/0cee7e54fda8ac99ec11459448e89c7d.jpg"
+}
+###
+
+POST  http://localhost:5000/api/users/login HTTP/1.1
+content-type: application/json
+
+{
+    "Email" : "test@user.com",
+    "Password" : "Test1234"    
 }
 
 ###
 
-POST  http://localhost:5000/users/register HTTP/1.1
+POST  http://localhost:5000/api/users/register HTTP/1.1
 content-type: application/json
 
 {
-    "FirstName" : "Kamel",
-    "LastName" : "Fakih",
-    "UserName" : "KamelFakih1",
-    "Email" : "kamel1@gmail.com",
-    "Password" : "Password123"   
+    "FirstName" : "test",
+    "LastName" : "user",
+    "UserName" : "test-user",
+    "Email" : "test@user.com",
+    "Password" : "Test1234"   
 }
 
 ###
 
-POST  http://localhost:5000/users/logout HTTP/1.1
+POST  http://localhost:5000/api/users/logout HTTP/1.1
 content-type: application/json

@@ -83,6 +83,7 @@ app.get('/dashboard', protected, (req, res) => {
     res.json({message : 'dashboard'})
 })
 
-app.use('/users', require('./routes/users'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/books', require('./routes/books'));
 
 app.listen(Number(PORT), console.log(`listening on port ${PORT}\nhttp://localhost:${PORT}/`));

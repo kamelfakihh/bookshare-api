@@ -1,0 +1,194 @@
+https://app.quickdatabasediagrams.com/#/
+
+Users
+-
+ID pk uuid
+FirstName varchar(255)
+LastName varchar(255)
+UserName UNIQUE varchar(255)
+password varchar(128)
+is_active boolean
+is_blocked boolean
+is_deleted boolean
+active_at timestamp
+created_at timestamp
+updated_at timestamp
+deleted_at timestamp
+
+Access
+-
+id pk uuid 
+userID uuid FK >- Users.ID
+token varchar(128)
+created_at timestamp
+expires_at timestamp
+deleted_at timestamp
+
+Books
+-
+ID PK serial
+userId uuid FK >- Users.ID
+title varchar(255)
+author varchar(255)
+published date
+description varchar(1000)
+category int FK >- Categories.ID
+level int FK >- Levels.ID
+ISBN varchar(13)
+available boolean
+location varchar(255)
+created_at timestamp
+updated_at timestamp
+deleted_at timestamp
+
+Notification
+-
+id pk serial
+userId int FK >- Users.ID
+message string
+viewed bool
+deleted_at datetime
+added_at datetime
+viewed_at datetime
+
+Categories
+-
+ID PK serial
+name string
+description string
+
+Levels
+-
+ID pk serial
+name string 
+description string
+
+Favourites
+-
+userId pk int FK >- Users.ID
+bookId pk int FK >- Books.ID
+added_at datetime
+removed_at datetime
+
+Viewed
+-
+userId pk int FK >- Users.ID
+bookId pk int FK >- Books.ID
+viewed_at datetime
+
+Given_away
+-
+ownerId pk int FK >- Users.ID
+bookId pk int FK >- Books.ID
+issuedTo int FK >- Users.ID 
+issued_at datetime
+
+Reports
+-
+ID pk uuid
+issued_by int FK >- Users.ID
+bookID int FK >- Books.ID
+type int FK >- ReportTypes.ID
+desc string
+reviewed bool
+created_at datetime
+reviewed_at datetime
+
+ReportTypes
+-
+ID pk serial
+name string 
+desc string
+
+***********************************************
+
+Users
+-
+ID pk uuid
+FirstName varchar(255)
+LastName varchar(255)
+Email varchar(255)
+UserName UNIQUE varchar(255)
+contact varchar(20)
+password varchar(128)
+is_blocked boolean
+active_at timestamp
+created_at timestamp
+updated_at timestamp
+deleted_at timestamp
+
+Books
+-
+ID PK serial
+userId uuid FK >- Users.ID
+title varchar(255)
+author varchar(255)
+published date
+description varchar(1000)
+category int FK >- Categories.ID
+level int FK >- Levels.ID
+ISBN varchar(14)
+available boolean
+location varchar(255)
+created_at timestamp
+updated_at timestamp
+deleted_at timestamp
+
+Notification
+-
+id pk serial
+userId uuid FK >- Users.ID
+message varchar(300)
+viewed boolean
+deleted_at timestamp
+added_at timestamp
+viewed_at timestamp
+
+Categories
+-
+ID PK serial
+name varchar(255)
+description varchar(1000)
+
+Levels
+-
+ID pk serial
+name varchar(255)
+description varchar(1000)
+
+Favourites
+-
+userId pk uuid FK >- Users.ID
+bookId pk int FK >- Books.ID
+added_at timestamp
+removed_at timestamp
+
+Viewed
+-
+userId pk uuid FK >- Users.ID
+bookId pk int FK >- Books.ID
+viewed_at timestamp
+
+Given_away
+-
+ownerId pk uuid FK >- Users.ID
+bookId pk int FK >- Books.ID
+issuedTo uuid FK >- Users.ID 
+issued_at timestamp
+
+Reports
+-
+ID pk uuid
+issued_by uuid FK >- Users.ID
+bookID int FK >- Books.ID
+type int FK >- ReportTypes.ID
+desc varchar(500)
+reviewed boolean
+created_at timestamp
+reviewed_at timestamp
+
+ReportTypes
+-
+ID pk serial
+name varchar(255)
+desc varchar(500)
