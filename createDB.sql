@@ -86,7 +86,6 @@ CREATE TABLE "Favourites" (
     "UserId" uuid   NOT NULL,
     "BookId" int   NOT NULL,
     "AddedAt" timestamp   NOT NULL DEFAULT NOW(),
-    "RemovedAt" timestamp,
     CONSTRAINT "pk_Favourites" PRIMARY KEY (
         "UserId","BookId"
      )
