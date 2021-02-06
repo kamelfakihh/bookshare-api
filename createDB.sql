@@ -41,6 +41,7 @@ CREATE TABLE "Books" (
     "Level" int   NOT NULL,
     "ISBN" varchar(14),
     "Available" boolean DEFAULT TRUE,
+    "Price" int NOT NULL DEFAULT 0,
     "Location" varchar(255)   NOT NULL,
     "CreatedAt" timestamp   NOT NULL DEFAULT NOW(),
     "UpdatedAt" timestamp   NOT NULL DEFAULT NOW(),
@@ -104,7 +105,6 @@ CREATE TABLE "Viewed" (
 CREATE TABLE "Given_Away" (
     "ownerId" uuid   NOT NULL,
     "BookId" int   NOT NULL,
-    "IssuedTo" uuid   NOT NULL,
     "IssuedAt" timestamp   NOT NULL DEFAULT NOW(),
     CONSTRAINT "pk_Given_away" PRIMARY KEY (
         "ownerId","BookId"
