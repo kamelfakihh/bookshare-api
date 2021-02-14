@@ -3,6 +3,7 @@ const express = require('express');
 const {Router} = require('express');
 const {protected, loggedIn} = require('../middlewares/protection');
 
+// load enviroment variables from .env file
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -15,7 +16,7 @@ const {
     DB_PASSWORD
 } = process.env;
 
-// create a new pg pool 
+// create a new pg pool to connect to database
 const pool = new Pool({
     user: DB_USER,
     host: DB_HOST,
@@ -32,13 +33,21 @@ const router = new Router();
 router.get('/', async (req, res) => {
     try {
 
-        const limit = req.query.limit <= 10 ? req.query.limit : 10;
-        const offset = req.query.offset <= 10 ? req.query.offset : 10;
+        // a client can add a limit value to params that can be a max of 20
+        if(req.query.limit || req.query.limit < 20) 
+            const limit = req.query.limit;
+        else 
+            const limit = 20
 
-        // fetch books from db, sorted by date 
+        // books are sorted by date
+        // so an offset = 0, returns the most recent books
+        if(req.query.offset)
+            const offset = req.query.offset
+        else
+            const offset = 0;
+
         const result = await pool.query(`select "ID", "Title", "Author" from "Books" WHERE "Books"."DeletedAt" is null ORDER BY "CreatedAt" DESC OFFSET ${offset} LIMIT ${limit};`);
     
-        // return result to client
         if(result.rowCount != 0){
             return res.status(200).json({
                 offset,
@@ -68,11 +77,9 @@ router.get('/:id', async (req, res) => {
 
     try {
         
-        // get book id from params
         const BookId = req.params.id;
         const {userId} = req.session;
 
-        // fetch book from db
         const result = await pool.query(
             `select "Books"."ID", "Books"."Title", "Books"."Author", "Books"."Description", 
             "Books"."PublishDate", "Books"."Image_url", "Books"."ISBN", "Books"."Available", 
@@ -89,13 +96,13 @@ router.get('/:id', async (req, res) => {
             exists = fav.rows[0].exists;
         }
 
-        // return result
         if(result.rowCount != 0){
             
             res.status(200).json({
                 body : {
                     ...result.rows[0],
-                    favourite : exists                },
+                    favourite : exists               
+                },
                 message : null
             });
 
@@ -132,7 +139,7 @@ router.post('/post', protected, async (req, res) => {
 
         const {userId} = req.session;
 
-        // check for null values in request (columns that are NOT NULL in the Books table)
+        // check for null values in request (some columns in Books table can't be null)
         if( !Title || !Genre || !Level || !Location){
             return res.status(400).json({message : "invalid post parameters !"});
         }
@@ -140,7 +147,7 @@ router.post('/post', protected, async (req, res) => {
         const query = `INSERT INTO "Books" ("UserId", "Title", "Author", "Description", "PublishDate", "Genre", "Level", "ISBN", "Location", "Image_url") 
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) `;
 
-        // add book to db
+        // add book to database
         const result = await pool.query(
             query, 
             [

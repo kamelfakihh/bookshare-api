@@ -5,7 +5,7 @@ const {isEmail, isPassword} = require('../helper/validation');
 const {hashPassword, verifyPassword} = require('../helper/password');
 const {protected, loggedIn} = require('../middlewares/protection');
 
-// add to enviroment variables from .env file
+// load enviroment variables from .env file
 const dotenv = require('dotenv');
 dotenv.config();
 
