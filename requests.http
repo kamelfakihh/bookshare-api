@@ -1,6 +1,6 @@
 ###
 
-GET http://localhost:5000/api/books/?offset=0&limit=3
+GET http://localhost:5000/api/books/?offset=5&limit=3
 
 ###
 
@@ -8,15 +8,15 @@ GET http://localhost:5000/api/books/
 
 ###
 
-GET http://localhost:5000/api/books/17
+GET http://localhost:5000/api/books/7
 
 ###
 
-POST http://localhost:5000/api/books/fav/17
+POST http://localhost:5000/api/books/save/11
 
 ###
 
-DELETE  http://localhost:5000/api/books/17
+DELETE  http://localhost:5000/api/books/13
 
 ###
 

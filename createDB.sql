@@ -17,7 +17,7 @@ CREATE TABLE "Users" (
     "Email" varchar(255)   NOT NULL,
     "UserName" varchar(255)   NOT NULL,
     "PhoneNumber" varchar(20),
-    "Password" varchar(128)   NOT NULL,
+    "Password" varchar(255)   NOT NULL,
     "ActiveAt" timestamp,
     "CreatedAt" timestamp   NOT NULL DEFAULT NOW(),
     "DeletedAt" timestamp,
@@ -77,7 +77,6 @@ CREATE TABLE "Saved" (
     "UserId" uuid   NOT NULL,
     "BookId" int   NOT NULL,
     "AddedAt" timestamp   NOT NULL DEFAULT NOW(),
-    "RemovedAt" timestamp   NOT NULL,
     CONSTRAINT "pk_Saved" PRIMARY KEY (
         "ID"
      )
@@ -190,4 +189,5 @@ CREATE VIEW "NotDeletedBooks" as
 
 CREATE VIEW "GetBooks" as
 	SELECT "AvailableBooks"."ID", "AvailableBooks"."Title", "AvailableBooks"."Author"
-    FROM "AvailableBooks" ;
+    FROM "AvailableBooks"
+    ORDER BY "AvailableBooks"."CreatedAt" DESC ;

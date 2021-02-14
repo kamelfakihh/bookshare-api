@@ -33,20 +33,22 @@ const router = new Router();
 router.get('/', async (req, res) => {
     try {
 
+        let limit, offset;
+
         // a client can add a limit value to params that can be a max of 20
         if(req.query.limit || req.query.limit < 20) 
-            const limit = req.query.limit;
+            limit = req.query.limit;
         else 
-            const limit = 20
+            limit = 20
 
         // books are sorted by date
         // so an offset = 0, returns the most recent books
         if(req.query.offset)
-            const offset = req.query.offset
+            offset = req.query.offset
         else
-            const offset = 0;
+            offset = 0;
 
-        const result = await pool.query(`select "ID", "Title", "Author" from "Books" WHERE "Books"."DeletedAt" is null ORDER BY "CreatedAt" DESC OFFSET ${offset} LIMIT ${limit};`);
+        const result = await pool.query(`select * from "GetBooks" OFFSET ${offset} LIMIT ${limit};`);
     
         if(result.rowCount != 0){
             return res.status(200).json({
@@ -81,19 +83,17 @@ router.get('/:id', async (req, res) => {
         const {userId} = req.session;
 
         const result = await pool.query(
-            `select "Books"."ID", "Books"."Title", "Books"."Author", "Books"."Description", 
-            "Books"."PublishDate", "Books"."Image_url", "Books"."ISBN", "Books"."Available", 
-            "Genres"."Name" AS "Genre", "Levels"."Name" AS "Level", "Books"."Location", "Books"."CreatedAt" 
-            from "Books", "Genres", "Levels" 
-            WHERE "Books"."Level" = "Levels"."ID" and "Books"."Genre" = "Genres"."ID" and "Books"."ID" = ${BookId} and "Books"."DeletedAt" is null`
+            `select * 
+            FROM "AvailableBooks" 
+            WHERE "AvailableBooks"."ID" = ${BookId}`
         );
 
-        // check if book is in user's favourites list
+        // check if book is in user's saved list
         let exists = false;
         if(userId){
-            const fav = await pool.query(`SELECT EXISTS (SELECT * FROM "Favourites" 
+            const saved = await pool.query(`SELECT EXISTS (SELECT * FROM "Saved" 
                                          WHERE "UserId" = $1 AND "BookId" = $2);`, [userId, BookId]); 
-            exists = fav.rows[0].exists;
+            exists = saved.rows[0].exists;
         }
 
         if(result.rowCount != 0){
@@ -101,7 +101,7 @@ router.get('/:id', async (req, res) => {
             res.status(200).json({
                 body : {
                     ...result.rows[0],
-                    favourite : exists               
+                    saved : exists               
                 },
                 message : null
             });
@@ -144,15 +144,15 @@ router.post('/post', protected, async (req, res) => {
             return res.status(400).json({message : "invalid post parameters !"});
         }
 
-        const query = `INSERT INTO "Books" ("UserId", "Title", "Author", "Description", "PublishDate", "Genre", "Level", "ISBN", "Location", "Image_url") 
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) `;
+        const query = `INSERT INTO "Books" ("UserId", "Title", "Author", "Description", "PublishDate", "Genre", "ISBN", "Location", "Image_url") 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) `;
 
         // add book to database
         const result = await pool.query(
             query, 
             [
                 userId, Title, Author || null, Description || null, PublishDate || null,
-                Genre, Level, ISBN || null, Location, image_url || null
+                Genre, ISBN || null, Location, image_url || null
             ]
         );
         
@@ -176,8 +176,19 @@ router.delete('/:id', protected, async (req, res) => {
     try {
 
         const BookId = req.params.id;
+        const {userId} = req.session;
 
-        const result = await pool.query('UPDATE "Books" SET "DeletedAt" = NOW() WHERE "Books"."ID" = $1', [BookId]); 
+        // check if a book is already deleted 
+        let exists = false;
+        if(userId){
+            const saved = await pool.query(`SELECT EXISTS (SELECT * FROM "AvailableBooks" 
+                                         WHERE "AvailableBooks"."ID" = $1 );`, [BookId]); 
+            exists = saved.rows[0].exists;
+        }
+
+        let result;
+        if(exists) result = await pool.query('UPDATE "Books" SET "DeletedAt" = NOW() WHERE "Books"."ID" = $1', [BookId]); 
+        else return res.status(400).json({message : "book not found"});
 
         if(result.rowCount >= 1){
             return res.status(200).json({message : "deleted 1 book"});
@@ -191,39 +202,49 @@ router.delete('/:id', protected, async (req, res) => {
     }
 });
 
-// @route       POST api/books/fav/:id
-// @desc        adds/removes a book from favourites list
+// @route       POST api/books/save/:id
+// @desc        adds/removes a book from saved list
 // @access      Protected
-router.post('/fav/:id', protected, async (req, res) => {
+router.post('/save/:id', protected, async (req, res) => {
 
     try {
 
         const {userId} = req.session;
         const BookId = req.params.id;
 
-        // check if book is already in favourites list
-        let result = await pool.query(`SELECT EXISTS (SELECT * FROM "Favourites" 
+        // check if a book is deleted deleted 
+        let deleted = false;
+        if(userId){
+            const saved = await pool.query(`SELECT EXISTS (SELECT * FROM "AvailableBooks" 
+                                         WHERE "AvailableBooks"."ID" = $1);`, [BookId]); 
+            deleted = !saved.rows[0].exists;
+        }
+
+        if(deleted) return res.status(400).json({message : "book not found"})
+
+        // check if book is already in Saved list
+        let result = await pool.query(`SELECT EXISTS (SELECT * FROM "Saved" 
                                          WHERE "UserId" = $1 AND "BookId" = $2);`, [userId, BookId]);
 
         const { exists } = result.rows[0];
 
         if(!exists){
-            // if not, add it to favourites
-            result = await pool.query(`INSERT INTO "Favourites" ("UserId", "BookId") VALUES ($1, $2);`, [userId, BookId]);
+            // if not, add it to Saved list
+            result = await pool.query(`INSERT INTO "Saved" ("UserId", "BookId") VALUES ($1, $2);`, [userId, BookId]);
 
             if(result.rowCount >= 1){
-                return res.status(200).json({message : "added book to favourites"});
+                return res.status(200).json({message : "saved book"});
             }else{
-                return res.status(503).json({message : "failed to add book to favourites"});
+                return res.status(503).json({message : "failed to save book"});
             }
         }else{
-            // else, remove it from favourites
-            result = await pool.query(`DELETE FROM "Favourites" WHERE "UserId" = $1 AND "BookId" = $2`, [userId, BookId]);
+            // else, remove it from saved list
+            result = await pool.query(`DELETE FROM "Saved" WHERE "UserId" = $1 AND "BookId" = $2`, [userId, BookId]);
 
             if(result.rowCount >= 1){
-                return res.status(200).json({message : "removed book from favourites"});
+                return res.status(200).json({message : "removed book from saved list"});
             }else{
-                return res.status(503).json({message : "failed to remove book from favourites"});
+                return res.status(503).json({message : "failed to remove book from saved list"});
             }
         }
 
