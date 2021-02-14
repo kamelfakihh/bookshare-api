@@ -192,3 +192,91 @@ ReportTypes
 ID pk serial
 name varchar(255)
 desc varchar(500)
+
+
+********************************************************************************************************888
+
+Users
+-
+ID pk uuid
+FirstName varchar(255)
+LastName varchar(255)
+Email varchar(255)
+UserName UNIQUE varchar(255)
+PhoneNumber varchar(20)
+Password varchar(128)
+LastActiveAt timestamp
+CreatedAt timestamp
+DeletedAt timestamp
+BlockedAt timestamp
+
+Books
+-
+ID PK serial
+UserId uuid FK >- Users.ID
+Title varchar(255)
+Author varchar(255)
+PublishDate date
+Description varchar(1000)
+Image_url varchar(2083)
+Genre int FK >- Genres.ID
+ISBN varchar(14)
+IsAvailable boolean
+Price double
+PriceCurrency varchar(3)
+Location varchar(255)
+CreatedAt timestamp
+DeletedAt timestamp
+
+Notification
+-
+ID pk serial
+UserId uuid FK >- Users.ID
+Message varchar(300)
+DeletedAt timestamp
+AddedAt timestamp
+ViewedAt timestamp
+
+Genres
+-
+ID PK serial
+Name varchar(255)
+Description varchar(1000)
+
+
+Saved
+-
+ID pk serial
+UserId uuid FK >- Users.ID
+BookId int FK >- Books.ID
+AddedAt  timestamp
+RemovedAt timestamp
+
+Viewed
+-
+ID pk serial
+UserId uuid FK >- Users.ID
+BookId int FK >- Books.ID
+ViewedAt timestamp
+
+GivenAway
+-
+OwnerId pk uuid FK >- Users.ID
+BookId pk int FK >- Books.ID
+GivenAt timestamp
+
+Reports
+-
+ID pk uuid
+IssuedBy uuid FK >- Users.ID
+BookID int FK >- Books.ID
+Type int FK >- ReportTypes.ID
+Description varchar(500)
+CreatedAt timestamp
+ReviewedAt timestamp
+
+ReportTypes
+-
+ID pk serial
+Name varchar(255)
+Description varchar(500)
