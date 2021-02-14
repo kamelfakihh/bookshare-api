@@ -5,8 +5,8 @@ const {isEmail, isPassword} = require('../helper/validation');
 const {hashPassword, verifyPassword} = require('../helper/password');
 const {protected, loggedIn} = require('../middlewares/protection');
 
+// add to enviroment variables from .env file
 const dotenv = require('dotenv');
-
 dotenv.config();
 
 const {
@@ -18,7 +18,7 @@ const {
     DB_PASSWORD
 } = process.env;
 
-// create a new pg pool 
+// create a new pg pool to connect to database
 const pool = new Pool({
     user: DB_USER,
     host: DB_HOST,
@@ -38,10 +38,9 @@ router.post('/login', loggedIn, async (req, res) => {
 
         const {Email, Password} = req.body;
 
-        // validate email and password
         if( isEmail(Email) && isPassword(Password)){
 
-            // check if user exists in users table
+            // check if user already exists in users table
             let result = await pool.query(`SELECT * FROM "Users" WHERE "Email" = '${Email}';`);
             const user = result.rows[0];
             
@@ -49,9 +48,8 @@ router.post('/login', loggedIn, async (req, res) => {
                 return res.status(400).json({message : 'account does not exist'});
             }
 
-            // verify password is true
             if(await verifyPassword(Password, user.Password)){
-                // add user to session after authorization
+                // add authorized user to session
                 req.session.userId =  user.ID;    
 
                 return res.status(200).json({
@@ -86,7 +84,7 @@ router.post('/register', loggedIn, async (req, res) => {
         const {Email, UserName, FirstName, LastName, Password} = req.body;
         
 
-        // validate email and password
+        // validate request
         if( isEmail(Email) && isPassword(Password) && UserName && FirstName && LastName){
 
             // check if email is already in use
@@ -109,7 +107,7 @@ router.post('/register', loggedIn, async (req, res) => {
                 return res.status(500).json({message : 'failed to register'});
             }
 
-            // add user id to session
+            // a registered user is also logged in by adding him to session
             req.session.userId =  user.ID;
             res.status(200).json({FirstName, LastName, UserName});
 
@@ -128,6 +126,9 @@ router.post('/register', loggedIn, async (req, res) => {
 // @desc        logut a user
 // @access      Protected
 router.post('/logout', protected,  (req, res) => {
+
+    // delete user session, then sends response to clear
+    // httponly cookies from user's browser
     req.session.destroy( error => {
         if(error){
             res.status(403).json({message : 'failed to logout'});

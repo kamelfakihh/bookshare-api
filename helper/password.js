@@ -1,7 +1,5 @@
 const crypto = require('crypto');
 
-
-// generate hash for a password
 exports.hashPassword = async function (password){
 
     return new Promise((resolve, reject) => {
@@ -13,26 +11,25 @@ exports.hashPassword = async function (password){
         crypto.scrypt(password, salt, 64, (error, key) => {
             if(error) reject(error);
 
-            // return hashed password and key
+            // add key to hashed password
             resolve(salt + ':' + key.toString('hex'));
         })
 
     })
 }
 
-// verify a password
 exports.verifyPassword = async function(password, hash){
 
     return new Promise((resolve, reject) => {
         
         let [salt, key] = hash.split(':');
 
-        // generate new hash from pasword
+        // generate hash from same salt
         crypto.scrypt(password, salt, 64, (error, derivedKey) => {
 
             if(error) reject(error);
 
-            // return true of derivedKey matched initial key 
+            // check if new hash matches with one stored in db
             resolve(key === derivedKey.toString('hex'));
         })
     })

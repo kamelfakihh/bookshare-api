@@ -24,7 +24,7 @@ const {
 // create an express app
 const app = express();
 
-// create a new pg pool 
+// create a pool to connect to database
 const pgPool = new Pool({
     user: DB_USER,
     host: DB_HOST,
@@ -33,7 +33,8 @@ const pgPool = new Pool({
     port: Number(DB_PORT),
 });
 
-// create connect-pg-simple session object
+// create connect-pg-simple session object that is responsible of storing 
+// user sessions in database
 const pgStore = new pgSession({
     pool : pgPool,
     tableName : 'session'
@@ -57,6 +58,7 @@ app.use(session({
 
 app.use(express.json());
 
+// middleware to add cors support to responses
 app.use((req, res, next) => {
     res.header('Access-control-Allow-Origin', 'http://localhost:3000');
     res.header(
@@ -70,9 +72,9 @@ app.use((req, res, next) => {
 
 // gets executed before all middlewares and adds user details to request locals object 
 // that is shared accross all middlewares
-app.use((req, res, next) => { 
-    next();
-});
+// app.use((req, res, next) => { 
+//     next();
+// });
 
 //routes
 app.get('/home', (req, res) => {
